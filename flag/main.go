@@ -10,6 +10,7 @@ type URLValue struct {
 	URL *url.URL
 }
 
+// 取值
 func (v URLValue) String() string {
 	if v.URL != nil {
 		return v.URL.String()
@@ -17,6 +18,7 @@ func (v URLValue) String() string {
 	return ""
 }
 
+// Set 设置值
 func (v URLValue) Set(s string) error {
 	if u, err := url.Parse(s); err != nil {
 		return err
@@ -30,6 +32,7 @@ var u = &url.URL{}
 
 func main() {
 	fs := flag.NewFlagSet("ExampleValue", flag.ExitOnError)
+
 	fs.Var(&URLValue{u}, "url", "URL to parse")
 
 	fs.Parse([]string{"-url", "https://golang.org/pkg/flag/"})

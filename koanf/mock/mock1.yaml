@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: # 默认 0.0.0.0:4317
+      http: # 默认 0.0.0.0:4318
+  jaeger:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:14260
+  receivers:
+    zipkin:
+      endpoint: 0.0.0.0:9411
+
+processors:
+  batch:
+    send_batch_size: 10000
+    timeout: 10s
+
+exporters:
+  jaeger:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:14250"
+  logging:
+    logLevel: debug
+  otlp:
+    # 导出到tempo
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+  zipkin:
+    endpoint: "http://some.url:9411/api/v2/spans"
+    tls:
+      insecure: true
+
+extensions:
+  memory_ballast:
+    size_mib: 64
+
+service:
+  pipelines: # section that can contain multiple subsections, one per pipeline
+    traces:  # type of the pipeline
+      receivers: [otlp, jaeger, zipkin]
+      processors: [memory_limiter, batch]
+      exporters: [otlp, jaeger, zipkin]
